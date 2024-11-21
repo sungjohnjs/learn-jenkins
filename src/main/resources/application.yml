@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: learn_jenkins
+
+server:
+  port: 8019
