@@ -16,7 +16,15 @@ pipeline {
     stage('Stop Current Running') {
       steps {
         echo('Stop Current Service If Exist')
-        sh('kill $(cat ./pid.file)')
+        sh """
+            if ps -p $(cat pid.file) > /dev/null; then
+                echo "Stopping process $(cat pid.file)"
+                kill -9 $(cat pid.file)
+            else
+                echo "No process with PID $(cat pid.file) found."
+            fi
+            """
+
       }
     }
     stage('Start') {
