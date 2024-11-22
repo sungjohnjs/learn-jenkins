@@ -31,7 +31,7 @@ pipeline {
     stage('Start') {
       steps {
         echo('Running the jar file')
-        sh('java -jar ./target/learn_jenkins-0.0.1.jar & echo $! > ./pid.file')
+        sh('nohup java -jar ./target/learn_jenkins-0.0.1.jar > log/other.log 2>&1 & echo $! > ./pid.file')
       }
     }
   }
