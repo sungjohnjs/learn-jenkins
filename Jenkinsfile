@@ -32,8 +32,8 @@ pipeline {
         echo('Running the jar file')
         script {
           sh """
-          nohup java -jar ./target/learn_jenkins-0.0.1.jar > app.log 2>&1 &
-          echo \${!} > ./pid.file
+          java -jar ./target/learn_jenkins-0.0.1.jar > app.log 2>&1 &
+          echo $! > ./pid.file
           """
         }
       }
