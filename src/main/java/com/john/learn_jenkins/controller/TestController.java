@@ -12,7 +12,4 @@ public class TestController {
 
         return "Halo Jenkins 02";
     }
-    /**
-     * 
-     */
 }
