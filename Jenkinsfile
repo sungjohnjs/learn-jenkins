@@ -16,14 +16,15 @@ pipeline {
     stage('Stop Current Running') {
       steps {
         echo('Stop Current Service If Exist')
-        sh """
-            if ps -p $(cat pid.file) > /dev/null; then
-                echo "Stopping process $(cat pid.file)"
-                kill -9 $(cat pid.file)
-            else
-                echo "No process with PID $(cat pid.file) found."
-            fi
-            """
+
+        script {
+          sh """
+          if lsof -i:8019 > /dev/null; then
+              echo "Port 8019 is in use. Stopping existing service..."
+              lsof -t -i:8019 | xargs kill -9
+          fi
+          """
+        }
 
       }
     }
