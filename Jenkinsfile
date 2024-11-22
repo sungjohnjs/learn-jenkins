@@ -1,6 +1,11 @@
 pipeline {
   agent any
 
+  environment {
+    JAVA_HOME = '/root/.sdkman/candidates/java/current'
+    PATH = "${JAVA_HOME}/bin:${env.PATH}"
+  }
+
   stages {
     stage('Build') {
       steps {
@@ -31,7 +36,7 @@ pipeline {
     stage('Start') {
       steps {
         echo('Running the jar file')
-        sh('mvn spring-boot:run')
+        sh('nohup java -jar ./target/learn_jenkins-0.0.1.jar > log/other.log 2>&1 & echo $! > ./pid.file')
       }
     }
   }
