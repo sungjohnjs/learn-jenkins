@@ -1,3 +1,4 @@
+/* groovylint-disable CompileStatic */
 pipeline {
   agent any
 
@@ -7,36 +8,90 @@ pipeline {
   }
 
   stages {
+    stage('Setup') {
+      steps {
+        script {
+          echo 'Preparing the environment...'
+          // Ensure log and target directories exist
+          sh 'mkdir -p log'
+          sh 'rm -rf target || true' // Clean previous build artifacts
+        }
+      }
+    }
+
     stage('Build') {
       steps {
-        echo('Packaging Code Into JAR File')
-        sh('mvn clean package')
+        script {
+          echo 'Building the project...'
+          sh 'mvn clean package -DskipTests' // Package the JAR without running tests
+        }
       }
     }
+
     stage('Test') {
       steps {
-        echo('Test Script Has not been made')
+        script {
+          echo 'Running tests...'
+          sh 'mvn test' // Run tests
+        }
       }
     }
-    stage('Stop Current Running') {
-      steps {
-        echo('Stop Current Service If Exist')
 
+    stage('Stop Current Service') {
+      steps {
         script {
-          sh """
+          echo 'Stopping any currently running service...'
+          sh '''
           if lsof -i:8019 > /dev/null; then
-              echo "Port 8019 is in use. Stopping existing service..."
-              lsof -t -i:8019 | xargs kill -9
+            echo "Port 8019 is in use. Stopping service..."
+            lsof -t -i:8019 | xargs kill -9 || true
           fi
+          '''
+        }
+      }
+    }
+
+    stage('Start Application') {
+      steps {
+        script {
+          echo 'Starting the Spring Boot application...'
+          sh """
+          nohup java -Dserver.port=8019 -Dserver.address=0.0.0.0 -jar ./target/learn_jenkins-0.0.1.jar > log/app.log 2>&1 &
+          echo \$! > pid.file
+          sleep 5
           """
         }
-
       }
     }
-    stage('Start') {
+
+    stage('Verify Deployment') {
       steps {
-        echo('Running the jar file')
-        sh('nohup java -jar ./target/learn_jenkins-0.0.1.jar > log/other.log 2>&1 & echo $! > ./pid.file')
+        script {
+          echo 'Verifying that the application is running...'
+          sh '''
+          if ! curl -s http://localhost:8019 > /dev/null; then
+            echo "Application is not running on port 8019."
+            exit 1
+          else
+            echo "Application is successfully running on port 8019."
+          fi
+          '''
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      script {
+        echo 'Pipeline completed. Cleaning up temporary files...'
+        sh 'rm -f pid.file || true'
+      }
+    }
+    failure {
+      script {
+        echo 'Pipeline failed. Check logs for details.'
+        sh 'cat log/app.log || true' // Output app log on failure for debugging
       }
     }
   }
