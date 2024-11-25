@@ -58,7 +58,7 @@ pipeline {
         script {
           echo 'Starting the Spring Boot application...'
           sh 'chmod +x ./bin ./bin/*'
-          sh './bin/start.sh'
+          sh 'JENKINS_NODE_COOKIE=dontKillMe && ./bin/start.sh'
         }
       }
     }
