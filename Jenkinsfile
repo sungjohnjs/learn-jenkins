@@ -15,6 +15,8 @@ pipeline {
           // Ensure log and target directories exist
           sh 'mkdir -p log'
           sh 'rm -rf target || true' // Clean previous build artifacts
+          echo 'Check Java Version'
+          sh 'java --version'
         }
       }
     }
