@@ -55,11 +55,8 @@ pipeline {
       steps {
         script {
           echo 'Starting the Spring Boot application...'
-          sh """
-          nohup java -Dserver.port=8019 -Dserver.address=0.0.0.0 -jar ./target/learn_jenkins-0.0.1.jar > log/app.log 2>&1 &
-          echo \$! > pid.file
-          sleep 5
-          """
+          sh 'chmod +x ./bin ./bin/*'
+          sh './bin/start.sh'
         }
       }
     }
