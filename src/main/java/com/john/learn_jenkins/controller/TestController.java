@@ -10,6 +10,6 @@ public class TestController {
   @GetMapping("")
     public String getTest() {
 
-        return "Halo Jenkins 05";
+        return "Halo Jenkins 06";
     }
 }

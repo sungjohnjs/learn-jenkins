@@ -5,6 +5,7 @@ pipeline {
   environment {
     JAVA_HOME = '/root/.sdkman/candidates/java/current'
     PATH = "${JAVA_HOME}/bin:${env.PATH}"
+    PORT = 8019
   }
 
   stages {
@@ -44,9 +45,9 @@ pipeline {
         script {
           echo 'Stopping any currently running service...'
           sh '''
-          if lsof -i:8019 > /dev/null; then
-            echo "Port 8019 is in use. Stopping service..."
-            lsof -t -i:8019 | xargs kill -9 || true
+          if lsof -i:${PORT} > /dev/null; then
+            echo "Port ${PORT} is in use. Stopping service..."
+            lsof -t -i:${PORT} | xargs kill -9 || true
           fi
           '''
         }
@@ -68,11 +69,11 @@ pipeline {
         script {
           echo 'Verifying that the application is running...'
           sh '''
-          if ! curl -s http://localhost:8019 > /dev/null; then
-            echo "Application is not running on port 8019."
+          if ! curl -s http://localhost:${PORT} > /dev/null; then
+            echo "Application is not running on port ${PORT}."
             exit 1
           else
-            echo "Application is successfully running on port 8019."
+            echo "Application is successfully running on port ${PORT}."
           fi
           '''
         }
