@@ -1,4 +1,3 @@
-/* groovylint-disable CompileStatic */
 pipeline {
   agent any
 
@@ -44,12 +43,12 @@ pipeline {
       steps {
         script {
           echo 'Stopping any currently running service...'
-          sh '''
+          sh """
           if lsof -i:${PORT} > /dev/null; then
             echo "Port ${PORT} is in use. Stopping service..."
             lsof -t -i:${PORT} | xargs kill -9 || true
           fi
-          '''
+          """
         }
       }
     }
@@ -68,14 +67,14 @@ pipeline {
       steps {
         script {
           echo 'Verifying that the application is running...'
-          sh '''
+          sh """
           if ! curl -s http://localhost:${PORT} > /dev/null; then
             echo "Application is not running on port ${PORT}."
             exit 1
           else
             echo "Application is successfully running on port ${PORT}."
           fi
-          '''
+          """
         }
       }
     }
